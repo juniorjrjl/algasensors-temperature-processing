@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: algasensors-temperature-processing
+
+server:
+  port: 8081
