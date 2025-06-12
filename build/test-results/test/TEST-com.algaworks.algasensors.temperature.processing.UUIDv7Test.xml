@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.algaworks.algasensors.temperature.processing.UUIDv7Test" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-06-01T20:56:34.270Z" hostname="MacBook-Pro-do-Junior.local" time="0.031">
+  <properties/>
+  <testcase name="shouldGenerateUUIDv7()" classname="com.algaworks.algasensors.temperature.processing.UUIDv7Test" time="0.031"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
