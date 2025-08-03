@@ -3,7 +3,9 @@ package com.algaworks.algasensors.temperature.processing.api.controller;
 import com.algaworks.algasensors.temperature.processing.api.model.TemperatureLogResponse;
 import com.algaworks.algasensors.temperature.processing.common.IdGenerator;
 import io.hypersistence.tsid.TSID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 
+import static com.algaworks.algasensors.temperature.processing.infrastructure.rabbitmq.RabbitMQConfig.FANOUT_EXCHANGE;
 import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
@@ -20,7 +23,10 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 @Slf4j
 @RestController
 @RequestMapping("/api/sensors/{sensorId}/temperatures/data")
+@RequiredArgsConstructor
 public class TemperatureProcessingController {
+
+    private final RabbitTemplate rabbitTemplate;
 
     @PostMapping(consumes = TEXT_PLAIN_VALUE)
     void data(@PathVariable final TSID sensorId, @RequestBody final String input){
@@ -39,6 +45,11 @@ public class TemperatureProcessingController {
         response.setValue(temperature);
         response.setRegisteredAt(OffsetDateTime.now());
         log.info(response.toString());
+
+        rabbitTemplate.convertAndSend(FANOUT_EXCHANGE, "", response, m -> {
+            m.getMessageProperties().setHeader("sensorId", response.getSensorId());
+            return m;
+        });
     }
 
 
